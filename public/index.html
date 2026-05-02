@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>10k CHeckboxes</title>
+	<style>
+		:root {
+			--dark-green: #2e4635;
+			--peach: #ffd6ba;
+			--mocha: #b7a99a;
+			--text: #2e4635;
+			--bg: #f6f5f3;
+			--checkbox-bg: #e6e1dd;
+			--checkbox-border: #b7a99a;
+			--checkbox-checked: #2e4635;
+			--header-bg: #ffd6ba;
+		}
+		html, body {
+			height: 100%;
+			margin: 0;
+			padding: 0;
+			background: var(--bg);
+			color: var(--text);
+			font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+			min-height: 100vh;
+		}
+		body {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: flex-start;
+			min-height: 100vh;
+			padding: 0 1rem;
+		}
+		h1 {
+			background: var(--header-bg);
+			color: var(--dark-green);
+			padding: 1.2rem 2.5rem 1.2rem 2.5rem;
+			border-radius: 1.5rem;
+			margin-top: 2.5rem;
+			margin-bottom: 2.5rem;
+			font-size: 2.2rem;
+			font-weight: 700;
+			box-shadow: 0 2px 16px 0 rgba(46,70,53,0.07);
+			letter-spacing: 0.04em;
+		}
+		#con {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+			max-width: 900px;
+			margin-bottom: 3rem;
+			justify-content: center;
+		}
+		input[type="checkbox"] {
+			width: 1.2rem;
+			height: 1.2rem;
+			accent-color: var(--checkbox-checked);
+			background: var(--checkbox-bg);
+			border: 2px solid var(--checkbox-border);
+			border-radius: 0.4rem;
+			transition: box-shadow 0.2s;
+			box-shadow: 0 1px 4px 0 rgba(46,70,53,0.04);
+			cursor: pointer;
+		}
+		input[type="checkbox"]:focus {
+			outline: 2px solid var(--peach);
+			outline-offset: 2px;
+		}
+	</style>
+</head>
+<body>
+	<h1> 10k Checkboxes</h1>
+	<div id="error-message" style="display:none;color:#b94a48;background:#ffd6ba;border:1px solid #b7a99a;padding:0.7rem 1.2rem;margin-bottom:1.5rem;border-radius:0.7rem;font-size:1.1rem;max-width:900px;text-align:center;"></div>
+	<div id="con"></div>
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+		const socket = io();
+		const container = document.getElementById("con");
+		const errorDiv = document.getElementById("error-message");
+		const checkBoxCount = 100;
+
+		socket.on('server:error', ({data}) => {
+			const errorMessage = data.error;
+			if (errorMessage) {
+				errorDiv.textContent = errorMessage;
+				errorDiv.style.display = 'block';
+			} else {
+				errorDiv.textContent = '';
+				errorDiv.style.display = 'none';
+			}
+		});
+
+		socket.on('server:checkbox:change', (data) => {
+			console.log(`Socket Server Event`, data);
+			const {index, checked} = data;
+
+			const input = document.getElementById(`checkbox-${index}`)
+			if (input) {
+				input.checked = checked;
+			}
+		});
+
+		window.addEventListener('load', async() => {
+			const response = await fetch('/checkboxes', {method: 'GET'})
+			const data = await response.json();
+
+			if (data && data.checkboxes) {
+				data.checkboxes.forEach((serverValue, index) => {
+					const input = document.createElement('input');
+					input.type = 'checkbox';
+					input.id = `checkbox-${index}`;
+					input.checked = serverValue;
+
+					input.addEventListener('change', event => {
+						const checked = event.target.checked;
+						console.log('Checkbox Changed' , {index, checked});
+						socket.emit('client:checkbox:change', {index, checked});
+					});
+					container.appendChild(input);
+				});
+			}
+		});
+	</script>
+</body>
+</html>
