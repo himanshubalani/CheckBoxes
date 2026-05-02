@@ -58,22 +58,42 @@
 			background: #ffd6ba;
 			border: 1px solid #b7a99a;
 			padding: 0.7rem 1.2rem;
+			margin-bottom: 1.5rem;
 			border-radius: 0.7rem;
 			font-size: 1.1rem;
 			max-width: 400px;
 			text-align: center;
-			position: fixed;
-			top: 1rem;
-			right: 1rem;
-			z-index: 9999;
-			box-shadow: 0 4px 12px rgba(46, 70, 53, 0.2);
+			margin-left: auto;
+			margin-right: 1rem;
+			margin-top: 1rem;
 		}
+		.credit-bar {
+	width: 100%;
+	background: var(--dark-green);
+	color: var(--bg);
+	text-align: center;
+	font-size: 0.8rem;
+	padding: 0.3rem 0;
+	letter-spacing: 0.05em;
+}
+.credit-bar a {
+	color: var(--peach);
+	text-decoration: none;
+	font-weight: bold;
+}
+.credit-bar a:hover {
+	text-decoration: underline;
+}
 	</style>
 </head>
 <body>
+	<div class="credit-bar">
+		made by <a href="https://www.himanshubalani.com" target="_blank">himanshubalani.com</a>
+	</div>
+
 	<div class="header-container">
 		<div class="stats">Total Clicks: <span id="click-counter">0</span></div>
-		<h1>10k Checkboxes</h1>
+		<h1>1 Million Checkboxes</h1>
 		<div id="auth-section">
 			<!-- Will be populated by JS -->
 		</div>
