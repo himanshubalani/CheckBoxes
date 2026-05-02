@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>10k CHeckboxes</title>
+	<title>10k Checkboxes</title>
 	<style>
 		:root {
 			--dark-green: #2e4635;
@@ -17,96 +17,122 @@
 			--header-bg: #ffd6ba;
 		}
 		html, body {
-			height: 100%;
-			margin: 0;
-			padding: 0;
-			background: var(--bg);
-			color: var(--text);
+			margin: 0; padding: 0;
+			background: var(--bg); color: var(--text);
 			font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-			min-height: 100vh;
 		}
 		body {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			justify-content: flex-start;
-			min-height: 100vh;
-			padding: 0 1rem;
+			display: flex; flex-direction: column;
+			align-items: center; padding: 0 1rem;
+		}
+		.header-container {
+			display: flex; justify-content: space-between; align-items: center;
+			width: 100%; max-width: 1000px; padding-top: 1rem;
 		}
 		h1 {
-			background: var(--header-bg);
-			color: var(--dark-green);
-			padding: 1.2rem 2.5rem 1.2rem 2.5rem;
-			border-radius: 1.5rem;
-			margin-top: 2.5rem;
-			margin-bottom: 2.5rem;
-			font-size: 2.2rem;
-			font-weight: 700;
+			background: var(--header-bg); color: var(--dark-green);
+			padding: 1rem 2rem; border-radius: 1.5rem;
+			font-size: 2rem; font-weight: 700;
 			box-shadow: 0 2px 16px 0 rgba(46,70,53,0.07);
-			letter-spacing: 0.04em;
+		}
+		.stats {
+			font-size: 1.2rem; font-weight: bold; background: var(--checkbox-bg);
+			padding: 0.5rem 1rem; border-radius: 1rem;
 		}
 		#con {
-			display: flex;
-			flex-wrap: wrap;
-			gap: 0.5rem;
-			max-width: 900px;
-			margin-bottom: 3rem;
-			justify-content: center;
+			display: flex; flex-wrap: wrap; gap: 2px; /* Tighter gap for 10k */
+			max-width: 95vw; margin-bottom: 3rem; justify-content: center;
 		}
 		input[type="checkbox"] {
-			width: 1.2rem;
-			height: 1.2rem;
+			width: 14px; height: 14px; margin: 0;
 			accent-color: var(--checkbox-checked);
-			background: var(--checkbox-bg);
-			border: 2px solid var(--checkbox-border);
-			border-radius: 0.4rem;
-			transition: box-shadow 0.2s;
-			box-shadow: 0 1px 4px 0 rgba(46,70,53,0.04);
 			cursor: pointer;
 		}
-		input[type="checkbox"]:focus {
-			outline: 2px solid var(--peach);
-			outline-offset: 2px;
+		.auth-btn {
+			padding: 0.5rem 1rem; background: var(--dark-green);
+			color: white; text-decoration: none; border-radius: 0.5rem;
+		}
+		#error-message {
+			display: none;
+			color: #b94a48;
+			background: #ffd6ba;
+			border: 1px solid #b7a99a;
+			padding: 0.7rem 1.2rem;
+			border-radius: 0.7rem;
+			font-size: 1.1rem;
+			max-width: 400px;
+			text-align: center;
+			position: fixed;
+			top: 1rem;
+			right: 1rem;
+			z-index: 9999;
+			box-shadow: 0 4px 12px rgba(46, 70, 53, 0.2);
 		}
 	</style>
 </head>
 <body>
-	<h1> 10k Checkboxes</h1>
-	<div id="error-message" style="display:none;color:#b94a48;background:#ffd6ba;border:1px solid #b7a99a;padding:0.7rem 1.2rem;margin-bottom:1.5rem;border-radius:0.7rem;font-size:1.1rem;max-width:900px;text-align:center;"></div>
+	<div class="header-container">
+		<div class="stats">Total Clicks: <span id="click-counter">0</span></div>
+		<h1>10k Checkboxes</h1>
+		<div id="auth-section">
+			<!-- Will be populated by JS -->
+		</div>
+	</div>
+
+	<div id="error-message" style="display:none;color:#b94a48;background:#ffd6ba;border:1px solid #b7a99a;padding:0.7rem 1.2rem;margin-bottom:1.5rem;border-radius:0.7rem;font-size:1.1rem;text-align:center;"></div>
 	<div id="con"></div>
+
 	<script src="/socket.io/socket.io.js"></script>
 	<script>
 		const socket = io();
 		const container = document.getElementById("con");
 		const errorDiv = document.getElementById("error-message");
-		const checkBoxCount = 100;
+		const clickCounter = document.getElementById("click-counter");
 
-		socket.on('server:error', ({data}) => {
-			const errorMessage = data.error;
-			if (errorMessage) {
-				errorDiv.textContent = errorMessage;
-				errorDiv.style.display = 'block';
+		// Fetch User Info (OIDC)
+		fetch('/api/user').then(res => res.json()).then(data => {
+			const authDiv = document.getElementById('auth-section');
+			if (data.loggedIn) {
+				authDiv.innerHTML = `<span>Hi, ${data.user.nickname || data.user.name}</span> <a href="/logout" class="auth-btn">Logout</a>`;
 			} else {
-				errorDiv.textContent = '';
-				errorDiv.style.display = 'none';
+				authDiv.innerHTML = `<a href="/login" class="auth-btn">Login</a>`;
 			}
 		});
 
-		socket.on('server:checkbox:change', (data) => {
-			console.log(`Socket Server Event`, data);
-			const {index, checked} = data;
-
-			const input = document.getElementById(`checkbox-${index}`)
-			if (input) {
-				input.checked = checked;
+		// Server Error / Rate Limit handling
+		socket.on('server:error', ({ data, revert }) => {
+			if (data.error) {
+				errorDiv.textContent = data.error;
+				errorDiv.style.display = 'block';
+				// Auto hide after 3 seconds
+				setTimeout(() => { errorDiv.style.display = 'none'; }, 3000);
 			}
+			// Revert the checkbox visually if server blocked the request
+			if (revert) {
+				const input = document.getElementById(`checkbox-${revert.index}`);
+				if (input) input.checked = revert.checked;
+			}
+		});
+
+		// Checkbox updates
+		socket.on('server:checkbox:change', (data) => {
+			const input = document.getElementById(`checkbox-${data.index}`);
+			if (input) input.checked = data.checked;
+		});
+
+		// Analytics updates
+		socket.on('server:analytics:update', (data) => {
+			clickCounter.textContent = data.totalClicks.toLocaleString();
 		});
 
 		window.addEventListener('load', async() => {
-			const response = await fetch('/checkboxes', {method: 'GET'})
+			const response = await fetch('/checkboxes');
 			const data = await response.json();
 
 			if (data && data.checkboxes) {
+				// Use DocumentFragment to inject 10,000 DOM nodes instantly without lag
+				const fragment = document.createDocumentFragment();
+				
 				data.checkboxes.forEach((serverValue, index) => {
 					const input = document.createElement('input');
 					input.type = 'checkbox';
@@ -115,11 +141,11 @@
 
 					input.addEventListener('change', event => {
 						const checked = event.target.checked;
-						console.log('Checkbox Changed' , {index, checked});
-						socket.emit('client:checkbox:change', {index, checked});
+						socket.emit('client:checkbox:change', { index, checked });
 					});
-					container.appendChild(input);
+					fragment.appendChild(input);
 				});
+				container.appendChild(fragment);
 			}
 		});
 	</script>

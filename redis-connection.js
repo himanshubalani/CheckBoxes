@@ -1,12 +1,13 @@
 import Redis from "ioredis";
+import 'dotenv/config';
 
 function createRedisConnection() {
 	return new Redis({
-	host: '0.0.0.0',
-	port: '6379',
-	})
+        host: process.env.REDIS_HOST || '0.0.0.0',
+        port: process.env.REDIS_PORT || '6379',
+	});
 }
 
 export const redis = createRedisConnection();
 export const publisher = createRedisConnection();
-export const subcriber = createRedisConnection();
+export const subscriber = createRedisConnection(); 
