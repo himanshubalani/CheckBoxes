@@ -37,7 +37,7 @@ services:
 ### Installation
 1. Clone the repository
 2. Install dependencies: `pnpm install`
-3. Copy `.env.example` to `.env` and fill in your Auth0 and Redis credentials.
+3. Copy `.env.example` to `.env` and fill in your Auth0 and Redis credentials. `cp .env.example .env`
 4. Start a local Redis server (e.g., `docker-compose up -d`)
 5. Start the application: `node index.js` or `node --watch index.js` for live updates.
 6. Visit `http://localhost:8000`
