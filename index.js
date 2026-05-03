@@ -9,7 +9,7 @@ import { time } from 'node:console';
 
 dotenv.config();
  
-const checkBoxSize = 100000;
+const checkBoxSize = 10000;
 const checkBoxStateKey = 'checkbox-state';
 const analyticsKey = 'checkbox-analytics:total_clicks';
  
