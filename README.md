@@ -2,8 +2,10 @@
 
 A highly scalable, real-time web application where users can interact with a massive grid of 1 Million checkboxes synchronously. Inspired by the "1 Million Checkboxes" concept.
 
-**Live Demo:** To be Added
+**Live Demo:** - https://check-boxes-ten.vercel.app/
 **Video Demo:** [10kCheckboxes Demo](https://youtu.be/LrHf0CR2OYk)
+**Blog Link** - [Building a 1 Million Checkbox Real-Time Grid](blog.himanshubalani.com/omcb)
+
 
 ## Tech Stack
 - **Frontend:** HTML5, CSS3, JavaScript (Vanilla, optimized with DocumentFragments)
