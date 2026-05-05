@@ -9,7 +9,7 @@ import { time } from 'node:console';
 
 dotenv.config();
  
-const checkBoxSize = 10000;
+const checkBoxSize = 1000000;
 const checkBoxStateKey = 'checkbox-state';
 const analyticsKey = 'checkbox-analytics:total_clicks';
  
@@ -43,14 +43,14 @@ async function main() {
  
     // --- OIDC CONFIGURATION (Auth0) ---
     // Will only activate if you provide a secret in your .env file
-    if (process.env.OIDC_SECRET) {
+    if (process.env.SECRET) {
         app.use(auth({
             authRequired: false, // Set to true if you want to force login
             auth0Logout: true,
-            secret: process.env.OIDC_SECRET,
+            secret: process.env.SECRET,
             baseURL: process.env.BASE_URL || `http://localhost:${PORT}`,
-            clientID: process.env.OIDC_CLIENT_ID,
-            issuerBaseURL: process.env.OIDC_ISSUER_BASE_URL
+            clientID: process.env.CLIENT_ID,
+            issuerBaseURL: process.env.ISSUER_BASE_URL
         }));
     }
  
@@ -70,9 +70,15 @@ async function main() {
  
     // --- SOCKET.IO HANDLERS ---
     io.on('connection', async (socket) => {
+
+        console.log(`Socket connected: `, {id: socket.id});
+        
+        let yourClicks = 0;
+
         // Send current analytics on connect
         const currentClicks = await redis.get(analyticsKey) || 0;
         socket.emit('server:analytics:update', { totalClicks: currentClicks });
+        socket.emit('server:your-clicks:update', { yourClicks });
  
         socket.on('client:checkbox:change', async (data) => {
             const now = Date.now();
@@ -106,12 +112,15 @@ async function main() {
             remoteData[data.index] = data.checked;
             await redis.set(checkBoxStateKey, JSON.stringify(remoteData));
             
-            // 3. Update Analytics (Total Clicks)
-            const newTotal = await redis.incr(analyticsKey);
+const newTotal = await redis.incr(analyticsKey);
+            yourClicks++;
  
             // 4. Publish to other instances
             publisher.publish('internal-server:checkbox:change', JSON.stringify(data));
             publisher.publish('internal-server:analytics:update', JSON.stringify({ totalClicks: newTotal }));
+
+            // 5. Emit your clicks (only to this specific socket)
+            socket.emit('server:your-clicks:update', { yourClicks });
         });
     });
     
@@ -121,7 +130,7 @@ async function main() {
     app.get('/health', (req, res) => res.json({ healthy: true }));
  
     app.get('/api/user', (req, res) => {
-        if (req.oidc && req.oidc.isAuthenticated()) {
+        if (req.oidc && req.oidc.user) {
             res.json({ loggedIn: true, user: req.oidc.user });
         } else {
             res.json({ loggedIn: false });
@@ -135,7 +144,32 @@ async function main() {
         }
         return res.json({ checkboxes: new Array(checkBoxSize).fill(false) });
     });
- 
+
+    // Add a signup route
+    app.get('/signup', (req, res) =>
+      res.oidc.login({
+        returnTo: '/',
+        authorizationParams: { screen_hint: 'signup' },
+      })
+    );
+
+    // Update the root route to show login/logout links
+    app.get('/', (req, res) => {
+      if (!req.oidc.isAuthenticated()) {
+        return res.type('html').send(`
+          <a href="/signup">Signup</a><br>
+          <a href="/login">Log in</a>
+        `);
+      }
+
+      res.type('html').send(`
+        <p>Logged in as ${req.oidc.user.name}</p>
+        <h1>User Profile</h1>
+        <pre>${JSON.stringify(req.oidc.user, null, 2)}</pre>
+        <a href="/logout">Log out</a>
+      `);
+    });
+
     server.listen(PORT, '0.0.0.0', () => {
         console.log(`Server is running on http://localhost:${PORT}`);
     });

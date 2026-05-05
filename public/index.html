@@ -3,169 +3,475 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>10k Checkboxes</title>
+	<title>1 Million Checkboxes</title>
+<meta name="title" content="1Million Checkboxes">
+<meta name="description" content="A grid of 1000x1000 checkboxes placed for you to fill">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://check-boxes-ten.vercel.app/">
+<meta property="og:title" content="1Million Checkboxes">
+<meta property="og:description" content="A grid of 1000x1000 checkboxes placed for you to fill">
+<meta property="og:site_name" content="1 Million Checkboxes">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="https://check-boxes-ten.vercel.app/">
+<meta property="twitter:title" content="1Million Checkboxes">
+<meta property="twitter:description" content="A grid of 1000x1000 checkboxes placed for you to fill">
+<meta property="twitter:creator" content="himanshubalani5">
+
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+
+
+
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 	<style>
 		:root {
-			--dark-green: #2e4635;
+			--dark-green: #1e3328;
+			--green-mid: #2e4635;
 			--peach: #ffd6ba;
+			--peach-light: #fff0e6;
 			--mocha: #b7a99a;
-			--text: #2e4635;
+			--text: #1e3328;
 			--bg: #f6f5f3;
 			--checkbox-bg: #e6e1dd;
 			--checkbox-border: #b7a99a;
 			--checkbox-checked: #2e4635;
-			--header-bg: #ffd6ba;
 		}
+
+		*, *::before, *::after { box-sizing: border-box; }
+
 		html, body {
 			margin: 0; padding: 0;
-			background: var(--bg); color: var(--text);
-			font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+			background: var(--bg);
+			color: var(--text);
+			font-family: 'DM Sans', sans-serif;
 		}
-		body {
-			display: flex; flex-direction: column;
-			align-items: center; padding: 0 1rem;
+
+		/* ── CREDIT BAR ── */
+		.credit-bar {
+			width: 100%;
+			background: var(--dark-green);
+			color: rgba(255,255,255,0.55);
+			text-align: center;
+			font-size: 0.72rem;
+			letter-spacing: 0.12em;
+			text-transform: uppercase;
+			padding: 0.45rem 0;
 		}
-		.header-container {
-			display: flex; justify-content: space-between; align-items: center;
-			width: 100%; max-width: 1000px; padding-top: 1rem;
+		.credit-bar a {
+			color: var(--peach);
+			text-decoration: none;
+			font-weight: 500;
+			transition: opacity 0.2s;
 		}
+		.credit-bar a:hover { opacity: 0.75; }
+
+		/* ── HEADER ── */
+		.site-header {
+			width: 100%;
+			background: var(--dark-green);
+			padding: 1.4rem 2rem 1.6rem;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 1rem;
+			position: relative;
+		}
+
+		/* Subtle decorative arc */
+		.site-header::after {
+			content: '';
+			position: absolute;
+			bottom: -28px;
+			left: 0; right: 0;
+			height: 30px;
+			background: var(--dark-green);
+			border-radius: 0 0 50% 50% / 0 0 100% 100%;
+			z-index: 0;
+		}
+
+		.header-left {
+			display: flex;
+			flex-direction: column;
+			gap: 0.15rem;
+		}
+
+		.header-eyebrow {
+			font-size: 0.65rem;
+			letter-spacing: 0.2em;
+			text-transform: uppercase;
+			color: var(--peach);
+			opacity: 0.7;
+			font-family: 'DM Sans', sans-serif;
+		}
+
 		h1 {
-			background: var(--header-bg); color: var(--dark-green);
-			padding: 1rem 2rem; border-radius: 1.5rem;
-			font-size: 2rem; font-weight: 700;
-			box-shadow: 0 2px 16px 0 rgba(46,70,53,0.07);
+			margin: 0;
+			font-family: 'Playfair Display', Georgia, serif;
+			font-size: clamp(1.6rem, 4vw, 2.4rem);
+			font-weight: 900;
+			color: #fff;
+			line-height: 1;
+			letter-spacing: -0.02em;
 		}
+
+		h1 span {
+			color: var(--peach);
+		}
+
+		/* Stats pill */
 		.stats {
-			font-size: 1.2rem; font-weight: bold; background: var(--checkbox-bg);
-			padding: 0.5rem 1rem; border-radius: 1rem;
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			background: rgba(255,255,255,0.08);
+			border: 1px solid rgba(255,214,186,0.2);
+			padding: 0.55rem 1.1rem;
+			border-radius: 999px;
+			color: #fff;
+			font-size: 0.85rem;
+			white-space: nowrap;
 		}
-		#con {
-			display: flex; flex-wrap: wrap; gap: 2px; /* Tighter gap for 10k */
-			max-width: 95vw; margin-bottom: 3rem; justify-content: center;
+		.stats-dot {
+			width: 7px; height: 7px;
+			border-radius: 50%;
+			background: var(--peach);
+			animation: pulse 2s ease-in-out infinite;
+		}
+		@keyframes pulse {
+			0%, 100% { opacity: 1; transform: scale(1); }
+			50% { opacity: 0.4; transform: scale(0.75); }
+		}
+		#checked-counter, #click-counter, #your-click-counter {
+			font-family: 'Playfair Display', serif;
+			font-weight: 700;
+			font-size: 1rem;
+			color: var(--peach);
+		}
+
+		/* Auth section */
+		#auth-section {
+			display: flex;
+			align-items: center;
+			gap: 0.6rem;
+			font-size: 0.85rem;
+			color: rgba(255,255,255,0.65);
+		}
+		.auth-btn {
+			display: inline-block;
+			padding: 0.45rem 1rem;
+			background: var(--peach);
+			color: var(--dark-green);
+			font-weight: 700;
+			font-size: 0.8rem;
+			letter-spacing: 0.06em;
+			text-transform: uppercase;
+			text-decoration: none;
+			border-radius: 999px;
+			transition: background 0.2s, transform 0.15s;
+		}
+		.auth-btn:hover {
+			background: #ffead5;
+			transform: translateY(-1px);
+		}
+
+		/* ── FLOATING ERROR ── */
+		#error-message {
+			display: none;
+			position: fixed;
+			top: 1.5rem;
+			left: 50%;
+			transform: translateX(-50%) translateY(12px);
+			z-index: 999;
+			background: #fff8f5;
+			color: #7a2e1e;
+			border: 1.5px solid #f4c0aa;
+			border-left: 4px solid #e05c35;
+			padding: 0.75rem 1.4rem;
+			border-radius: 0.75rem;
+			font-size: 0.9rem;
+			font-weight: 500;
+			max-width: 90vw;
+			text-align: center;
+			box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+			opacity: 0;
+			transition: opacity 0.25s ease, transform 0.25s ease;
+			pointer-events: none;
+		}
+		#error-message.visible {
+			opacity: 1;
+			transform: translateX(-50%) translateY(0);
+			pointer-events: auto;
+		}
+
+		/* ── CHECKBOXES ── */
+		body > #con {
+			position: relative;
+			max-width: 95vw;
+			margin: 3.5rem auto 3rem;
 		}
 		input[type="checkbox"] {
 			width: 14px; height: 14px; margin: 0;
 			accent-color: var(--checkbox-checked);
 			cursor: pointer;
+			position: absolute;
 		}
-		.auth-btn {
-			padding: 0.5rem 1rem; background: var(--dark-green);
-			color: white; text-decoration: none; border-radius: 0.5rem;
+
+		/* ── MOBILE ── */
+		@media (max-width: 600px) {
+			.site-header {
+				flex-wrap: wrap;
+				gap: 0.75rem;
+				padding: 1.2rem 1.2rem 1.4rem;
+			}
+			.header-left { flex: 1 1 auto; }
+			.stats { order: 3; flex: 1 1 100%; justify-content: center; }
+			#auth-section { order: 2; margin-left: auto; }
 		}
-		#error-message {
-			display: none;
-			color: #b94a48;
-			background: #ffd6ba;
-			border: 1px solid #b7a99a;
-			padding: 0.7rem 1.2rem;
-			margin-bottom: 1.5rem;
-			border-radius: 0.7rem;
-			font-size: 1.1rem;
-			max-width: 400px;
-			text-align: center;
-			margin-left: auto;
-			margin-right: 1rem;
-			margin-top: 1rem;
-		}
-		.credit-bar {
-	width: 100%;
-	background: var(--dark-green);
-	color: var(--bg);
-	text-align: center;
-	font-size: 0.8rem;
-	padding: 0.3rem 0;
-	letter-spacing: 0.05em;
-}
-.credit-bar a {
-	color: var(--peach);
-	text-decoration: none;
-	font-weight: bold;
-}
-.credit-bar a:hover {
-	text-decoration: underline;
-}
 	</style>
 </head>
 <body>
+
+	<!-- Credit bar -->
 	<div class="credit-bar">
 		made by <a href="https://www.himanshubalani.com" target="_blank">himanshubalani.com</a>
+		| Read <a href="https://blog.himanshubalani.com/omcb" target="_blank">Blog</a>
+		| Inspired by <a href="https://onemillioncheckboxes.com/" target="_blank">OMCB</a>
 	</div>
 
-	<div class="header-container">
-		<div class="stats">Total Clicks: <span id="click-counter">0</span></div>
-		<h1>10K Checkboxes</h1>
-		<div id="auth-section">
-			<!-- Will be populated by JS -->
+	<!-- Header -->
+	<header class="site-header">
+		<div class="header-left">
+			<h1>1 <span>Million</span> Checkboxes</h1>
 		</div>
-	</div>
 
-	<div id="error-message" style="display:none;color:#b94a48;background:#ffd6ba;border:1px solid #b7a99a;padding:0.7rem 1.2rem;margin-bottom:1.5rem;border-radius:0.7rem;font-size:1.1rem;text-align:center;"></div>
+		<div class="stats">
+			<div class="stats-dot"></div>
+			Boxes Checked&nbsp;
+			<span id="checked-counter">0</span>
+			&nbsp;|&nbsp;
+			Total Clicks&nbsp;
+			<span id="click-counter">0</span>
+			&nbsp;|&nbsp;
+			Your Clicks&nbsp;
+			<span id="your-click-counter">0</span>
+		</div>
+
+		<div id="auth-section"></div>
+	</header>
+
+	<!-- Floating error toast -->
+	<div id="error-message"></div>
+
+	<!-- Checkboxes -->
 	<div id="con"></div>
 
-	<script src="/socket.io/socket.io.js"></script>
+	<script src="https://cdn.socket.io/4.8.2/socket.io.min.js"></script>
 	<script>
 		const socket = io();
 		const container = document.getElementById("con");
 		const errorDiv = document.getElementById("error-message");
+		const checkedCounter = document.getElementById("checked-counter");
 		const clickCounter = document.getElementById("click-counter");
+		const yourClickCounter = document.getElementById("your-click-counter");
+		let errorTimeout;
 
-		// Fetch User Info (OIDC)
-		fetch('/api/user').then(res => res.json()).then(data => {
-			const authDiv = document.getElementById('auth-section');
-			if (data.loggedIn) {
-				authDiv.innerHTML = `<span>Hi, ${data.user.nickname || data.user.name}</span> <a href="/logout" class="auth-btn">Logout</a>`;
-			} else {
-				authDiv.innerHTML = `<a href="/login" class="auth-btn">Login</a>`;
+		// Auth
+		fetch('/api/user')
+			.then((response) => response.json())
+			.then((data) => {
+				const authDiv = document.getElementById('auth-section');
+				if (data.loggedIn) {
+					authDiv.innerHTML = `<span>Hi, ${data.user.name || data.user.nickname}</span> <a href="/logout" class="auth-btn">Logout</a>`;
+				} else {
+					authDiv.innerHTML = `<a href="/login" class="auth-btn">Login</a>`;
+				}
+			})
+			.catch((error) => {
+				console.error('Error fetching user data:', error);
+			});
+
+		// Floating error toast
+		function showError(msg) {
+			clearTimeout(errorTimeout);
+			errorDiv.textContent = msg;
+			errorDiv.style.display = 'block';
+			requestAnimationFrame(() => errorDiv.classList.add('visible'));
+			errorTimeout = setTimeout(() => {
+				errorDiv.classList.remove('visible');
+				setTimeout(() => { errorDiv.style.display = 'none'; }, 280);
+			}, 3000);
+		}
+
+// Virtual scrolling state
+		const CELL_SIZE = 16; // 14px box + 2px gap spacing
+		let checkboxesData =[]; 
+		const visibleCheckboxes = new Map(); 
+		let totalCheckboxes = 0;
+		let cols = 0;
+		let rows = 0;
+		let totalCheckedCount = 0;
+
+		function updateCheckboxState(index, checked) {
+			if (checkboxesData[index] !== checked) {
+				checkboxesData[index] = checked;
+				totalCheckedCount += checked ? 1 : -1;
+				checkedCounter.textContent = totalCheckedCount.toLocaleString();
 			}
-		});
+			const input = visibleCheckboxes.get(index);
+			if (input) input.checked = checked;
+		}
 
-		// Server Error / Rate Limit handling
 		socket.on('server:error', ({ data, revert }) => {
-			if (data.error) {
-				errorDiv.textContent = data.error;
-				errorDiv.style.display = 'block';
-				// Auto hide after 3 seconds
-				setTimeout(() => { errorDiv.style.display = 'none'; }, 3000);
-			}
-			// Revert the checkbox visually if server blocked the request
-			if (revert) {
-				const input = document.getElementById(`checkbox-${revert.index}`);
-				if (input) input.checked = revert.checked;
+			if (data?.error) showError(data.error);
+			if (revert && checkboxesData.length > revert.index) {
+				updateCheckboxState(revert.index, revert.checked);
 			}
 		});
 
-		// Checkbox updates
-		socket.on('server:checkbox:change', (data) => {
-			const input = document.getElementById(`checkbox-${data.index}`);
-			if (input) input.checked = data.checked;
+		socket.on('server:checkbox:change', ({ index, checked }) => {
+			if (checkboxesData.length > index) {
+				updateCheckboxState(index, checked);
+			}
 		});
 
-		// Analytics updates
-		socket.on('server:analytics:update', (data) => {
-			clickCounter.textContent = data.totalClicks.toLocaleString();
+		socket.on('server:checkbox:change', ({ index, checked }) => {
+			if (checkboxesData.length > index) {
+				checkboxesData[index] = checked;
+			}
+			const input = visibleCheckboxes.get(index);
+			if (input) input.checked = checked;
 		});
 
-		window.addEventListener('load', async() => {
-			const response = await fetch('/checkboxes');
-			const data = await response.json();
+		socket.on('server:analytics:update', ({ totalClicks }) => {
+			clickCounter.textContent = totalClicks.toLocaleString();
+		});
 
-			if (data && data.checkboxes) {
-				// Use DocumentFragment to inject 10,000 DOM nodes instantly without lag
-				const fragment = document.createDocumentFragment();
-				
-				data.checkboxes.forEach((serverValue, index) => {
+		socket.on('server:your-clicks:update', ({ yourClicks }) => {
+			yourClickCounter.textContent = yourClicks.toLocaleString();
+		});
+
+		function initVirtualGrid() {
+			// Calculate grid layout based on available window width
+			const availableWidth = window.innerWidth * 0.95; 
+			cols = Math.floor(availableWidth / CELL_SIZE);
+			rows = Math.ceil(totalCheckboxes / cols);
+			
+			// Define absolute bounds to force native scrollbar
+			container.style.width = `${cols * CELL_SIZE}px`;
+			container.style.height = `${rows * CELL_SIZE}px`;
+			
+			renderVisible();
+		}
+
+		function renderVisible() {
+			const rect = container.getBoundingClientRect();
+			const offsetTop = -rect.top;
+			const viewPortHeight = window.innerHeight;
+			
+			const BUFFER = 10; // Number of rows to load above/below the viewport
+			
+			let startRow = Math.floor(offsetTop / CELL_SIZE) - BUFFER;
+			let endRow = Math.floor((offsetTop + viewPortHeight) / CELL_SIZE) + BUFFER;
+			
+			startRow = Math.max(0, startRow);
+			endRow = Math.min(rows - 1, endRow);
+			
+			const startIndex = startRow * cols;
+			const endIndex = Math.min(totalCheckboxes - 1, ((endRow + 1) * cols) - 1);
+			
+			const newVisible = new Set();
+			const fragment = document.createDocumentFragment();
+			let added = false;
+			
+			for (let i = startIndex; i <= endIndex; i++) {
+				newVisible.add(i);
+				if (!visibleCheckboxes.has(i)) {
 					const input = document.createElement('input');
 					input.type = 'checkbox';
-					input.id = `checkbox-${index}`;
-					input.checked = serverValue;
-
-					input.addEventListener('change', event => {
-						const checked = event.target.checked;
-						socket.emit('client:checkbox:change', { index, checked });
+					input.id = `checkbox-${i}`;
+					input.checked = checkboxesData[i] || false;
+					
+					const c = i % cols;
+					const r = Math.floor(i / cols);
+					input.style.left = `${c * CELL_SIZE}px`;
+					input.style.top = `${r * CELL_SIZE}px`;
+					
+					input.addEventListener('change', e => {
+						updateCheckboxState(i, e.target.checked);
+						socket.emit('client:checkbox:change', { index: i, checked: e.target.checked });
 					});
+					
 					fragment.appendChild(input);
-				});
+					visibleCheckboxes.set(i, input);
+					added = true;
+				} else {
+					// Ensure state is perfectly synced when scrolling back up/down quickly
+					const input = visibleCheckboxes.get(i);
+					if (input.checked !== checkboxesData[i]) {
+						input.checked = checkboxesData[i];
+					}
+				}
+			}
+			
+			if (added) {
 				container.appendChild(fragment);
+			}
+			
+			// Clean up checkboxes that are now outside the visible window + buffer
+			for (const [i, input] of visibleCheckboxes.entries()) {
+				if (!newVisible.has(i)) {
+					container.removeChild(input);
+					visibleCheckboxes.delete(i);
+				}
+			}
+		}
+
+		// Use requestAnimationFrame for smooth scrolling performance
+		let scrollTicking = false;
+		window.addEventListener('scroll', () => {
+			if (!scrollTicking) {
+				window.requestAnimationFrame(() => {
+					renderVisible();
+					scrollTicking = false;
+				});
+				scrollTicking = true;
+			}
+		});
+
+		// Recalculate positions if window is resized
+		let resizeTimer;
+		window.addEventListener('resize', () => {
+			clearTimeout(resizeTimer);
+			resizeTimer = setTimeout(() => {
+				for (const input of visibleCheckboxes.values()) {
+					container.removeChild(input);
+				}
+				visibleCheckboxes.clear();
+				initVirtualGrid();
+			}, 150);
+		});
+
+		window.addEventListener('load', async () => {
+			const res = await fetch('/checkboxes');
+			const data = await res.json();
+			if (data?.checkboxes) {
+				checkboxesData = data.checkboxes;
+				totalCheckboxes = checkboxesData.length;
+				
+				let initialCount = 0;
+				for (let i = 0; i < totalCheckboxes; i++) {
+					if (checkboxesData[i]) initialCount++;
+				}
+				totalCheckedCount = initialCount;
+				checkedCounter.textContent = totalCheckedCount.toLocaleString();
+
+				initVirtualGrid();
 			}
 		});
 	</script>
